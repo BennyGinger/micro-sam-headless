@@ -30,7 +30,6 @@ def test_application_dependencies_are_optional() -> None:
         "python-elf",
         "scikit-learn",
         "superqt",
-        "timm",
         "torch-em",
         "trackastra",
         "xarray",
