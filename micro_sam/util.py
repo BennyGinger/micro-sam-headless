@@ -12,8 +12,6 @@ from pathlib import Path
 from collections import OrderedDict
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, Callable
 
-import elf.parallel as parallel_impl
-import imageio.v3 as imageio
 import numpy as np
 import pooch
 import segment_anything.utils.amg as amg_utils
@@ -21,7 +19,6 @@ import torch
 import xxhash
 import zarr
 
-from elf.io import open_file
 from bioimage_cpp.utils import Blocking
 from bioimage_cpp.distance import distance_transform
 from bioimage_cpp.segmentation import relabel_sequential
@@ -1343,8 +1340,12 @@ def load_image_data(path: str, key: Optional[str] = None, lazy_loading: bool = F
         The image data.
     """
     if key is None:
+        import imageio.v3 as imageio
+
         image_data = imageio.imread(path)
     else:
+        from elf.io import open_file
+
         with open_file(path, mode="r") as f:
             image_data = f[key]
             if not lazy_loading:
@@ -1796,6 +1797,8 @@ def mask_data_to_segmentation(
     Returns:
         The instance segmentation.
     """
+    import elf.parallel as parallel_impl
+
     masks = sorted(masks, key=(lambda x: x["area"]), reverse=True)
     if shape is None:
         shape = next(iter(masks))["segmentation"].shape
